@@ -67,9 +67,12 @@ class xinetd (
   $_only_from = simplib::nets2cidr($trusted_nets)
 
   if $::xinetd::package_ensure == 'absent' {
+    contain xinetd::install
     Class['xinetd::install']
   } else
   {
+    contain xinetd::install
+    contain xinetd::config
     Class['xinetd::install'] -> Class['xinetd::config']
   }
   
