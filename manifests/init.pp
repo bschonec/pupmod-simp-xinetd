@@ -69,23 +69,16 @@ class xinetd (
   if $::xinetd::package_ensure == 'absent' {
     notify {"ABSENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!":}
     contain xinetd::install
-    Class['xinetd::install']
+
+    # The xinetd package will (should) shut down the service itself.
+    Class['xinetd::install'] 
   } else
   {
     notify {"NOT NADA NYET ABSENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!":}
     contain xinetd::install
     contain xinetd::config
-    Class['xinetd::install'] -> Class['xinetd::config']
+    contain xinetd::xinet_service
+    Class['xinetd::install'] -> Class['xinetd::config'] -> Class['xinetd::xinet_service']
   }
   
-
-
-### The module should not be managing the services when $package_ensure == 'absent'.
-  service { 'xinetd':
-    ensure    => 'running',
-    enable    => true,
-    hasstatus => true,
-    restart   => '( /bin/ps -C xinetd && /sbin/service xinetd reload ) || /sbin/service xinetd start',
-    require   => Package['xinetd']
-  }
 }
